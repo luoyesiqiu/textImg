@@ -3,7 +3,6 @@ package com.luoye.fpic;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -27,15 +26,11 @@ import com.luoye.fpic.util.Utils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import android.os.Handler;
 import android.widget.Toast;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.logging.LogRecord;
 
 public class MainActivity extends Activity {
 
@@ -191,7 +186,7 @@ public class MainActivity extends Activity {
         private  byte[] convert(File input,File output,String text,int fontSize)
         {
             Bitmap bitmap= BitmapFactory.decodeFile(input.getAbsolutePath());
-            Bitmap target=Utils.getFontBitmap(bitmap,text,fontSize);
+            Bitmap target=Utils.getTextBitmap(bitmap,text,fontSize);
             FileOutputStream fileOutputStream=null;
             ByteArrayOutputStream byteArrayOutputStream=null;
             try {
