@@ -13,6 +13,7 @@ import android.os.Environment;
 import android.os.Message;
 import android.provider.MediaStore;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,6 +23,7 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.luoye.fpic.util.MediaScanner;
 import com.luoye.fpic.util.Utils;
 
 import java.io.ByteArrayOutputStream;
@@ -46,6 +48,7 @@ public class MainActivity extends Activity {
     private ProgressDialog progressDialog;
     private String SDCARD= Environment.getExternalStorageDirectory().getAbsolutePath();
     private  ConvertThread convertThread;
+    private  boolean isFinish=false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,6 +68,7 @@ public class MainActivity extends Activity {
 
         selectButton.setOnClickListener(new MyOnClickEvents());
         convertButton.setOnClickListener(new MyOnClickEvents());
+        imageView.setOnClickListener(new MyOnClickEvents());
 
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -88,6 +92,8 @@ public class MainActivity extends Activity {
         });
 
     }
+
+    private MediaScanner mediaScanner;
     private Handler handler=new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -99,15 +105,30 @@ public class MainActivity extends Activity {
                     showToast("转换失败");
                 }
                 else {
-
+                    isFinish=true;
                     imageView.setImageBitmap(BitmapFactory.decodeByteArray(data, 0, data.length));
                     if(progressDialog!=null)
                         progressDialog.dismiss();
                     showToast("转换成功，保存路径："+getOutputFile().getAbsolutePath());
+                    if (mediaScanner == null)
+                        mediaScanner = new MediaScanner(MainActivity.this);
+                    mediaScanner.scanFile(getOutputFile().getAbsolutePath(), "image/*");
                 }
             }
         }
     };
+
+
+    private   void shareImage(File imagePath) {
+        Uri imageUri = Uri.fromFile(imagePath);
+
+        Intent shareIntent = new Intent();
+        shareIntent.setAction(Intent.ACTION_SEND);
+        shareIntent.putExtra(Intent.EXTRA_STREAM, imageUri);
+        shareIntent.setType("image/*");
+        startActivity(Intent.createChooser(shareIntent, "分享到"));
+    }
+
     private  class MyOnClickEvents implements View.OnClickListener{
         @Override
         public void onClick(View view) {
@@ -139,6 +160,12 @@ public class MainActivity extends Activity {
                 convertThread=new ConvertThread(handler,imgPath,output,textEdit.getText().toString(),seekBar.getProgress());
                 convertThread.start();
             }
+            else if(view.getId()==R.id.main_iv)
+            {
+                //生成了才分享
+                if(isFinish)
+                    shareImage(getOutputFile());
+            }
         }
     }
     private  File getOutputFile() {
@@ -149,8 +176,6 @@ public class MainActivity extends Activity {
                 return null;
             }
         }
-//        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//        String date = simpleDateFormat.format(new Date());
         String name = imgPath.getName();
         File file = new File(dir, name);
         return  file;

@@ -1,4 +1,4 @@
 <resources>
     <string name="app_name">文字图生成</string>
-    <string name="help">落叶似秋制作\nQQ群：432872553</string>
+    <string name="help">开发者：落叶似秋\nQQ群：432872553\n开源地址：https://github.com/luoyesiqiu/textImg\n\n注：单击生成后的图片以分享</string>
 </resources>

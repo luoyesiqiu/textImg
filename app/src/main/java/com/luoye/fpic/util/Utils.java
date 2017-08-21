@@ -1,20 +1,14 @@
 package com.luoye.fpic.util;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.text.TextPaint;
-
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * Created by zyw on 2017/8/17.
  */
 public class Utils {
-
     /**
      * 核心，文本转成图片
      * @param bitmap 原图片
@@ -28,8 +22,8 @@ public class Utils {
             throw  new IllegalArgumentException("Bitmap cannot be null.");
         int picWidth=bitmap.getWidth();
         int picHeight=bitmap.getHeight();
-        Bitmap back= Bitmap.createBitmap((bitmap.getWidth()%fontSize==0)?bitmap.getWidth():((bitmap.getWidth()/fontSize+1)*fontSize)
-                ,(bitmap.getHeight()%fontSize==0)?bitmap.getHeight():((bitmap.getHeight()/fontSize+1)*fontSize)
+        Bitmap back= Bitmap.createBitmap((bitmap.getWidth()%fontSize==0)?bitmap.getWidth():((bitmap.getWidth()/fontSize)*fontSize)
+                ,(bitmap.getHeight()%fontSize==0)?bitmap.getHeight():((bitmap.getHeight()/fontSize)*fontSize)
                 , Bitmap.Config.ARGB_8888);
         Canvas canvas=new Canvas(back);
         canvas.drawColor(0xfff);
@@ -46,7 +40,6 @@ public class Utils {
                 paint.setTextSize(fontSize);
                 Paint.FontMetrics fontMetrics =paint.getFontMetrics();
                 float padding=(y==0)?(fontSize+fontMetrics.ascent):((fontSize+fontMetrics.ascent)*2);
-
                 canvas.drawText(String.valueOf(text.charAt(idx++)),x,y-padding,paint);
                 if(idx==text.length())
                 {
@@ -84,7 +77,7 @@ public class Utils {
     }
 
     /**
-     * 求取个颜色的平均值
+     * 求取多个颜色的平均值
      * @param colors
      * @return
      */
