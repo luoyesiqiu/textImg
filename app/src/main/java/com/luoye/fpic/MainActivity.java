@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -20,6 +21,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -49,6 +52,10 @@ public class MainActivity extends Activity {
     private String SDCARD= Environment.getExternalStorageDirectory().getAbsolutePath();
     private  ConvertThread convertThread;
     private  boolean isFinish=false;
+    private RadioGroup radioGroup;
+    private RadioButton radioButtonText;
+    private  RadioButton radioButtonBlock;
+    private  EditText backColorEditText;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,6 +67,10 @@ public class MainActivity extends Activity {
         seekBarText=(TextView)findViewById(R.id.seek_bar_text);
         imageView=(ImageView)findViewById(R.id.main_iv);
         convertButton=(Button)findViewById(R.id.convert_button);
+        backColorEditText=(EditText) findViewById(R.id.back_color_edit);
+        radioGroup=(RadioGroup)findViewById(R.id.main_radio_group);
+        radioButtonText=(RadioButton)findViewById(R.id.text_radio_button) ;
+        radioButtonBlock=(RadioButton)findViewById(R.id.block_radio_button) ;
 
         progressDialog=new ProgressDialog(this);
         progressDialog.setMessage("转换中,请稍等...");
@@ -88,6 +99,19 @@ public class MainActivity extends Activity {
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
 
+            }
+        });
+        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup radioGroup, int checkId) {
+                if(checkId==R.id.text_radio_button)
+                {
+                    textEdit.setEnabled(true);
+                    backColorEditText.setEnabled(true);
+                }else {
+                    textEdit.setEnabled(false);
+                    backColorEditText.setEnabled(false);
+                }
             }
         });
 
@@ -144,10 +168,24 @@ public class MainActivity extends Activity {
                     showToast("请先选择图片");
                     return;
                 }
-                if(TextUtils.isEmpty(textEdit.getText()))
+                if(TextUtils.isEmpty(textEdit.getText())&&radioButtonText.isChecked())
                 {
                     showToast("请输入文本");
                     return ;
+                }
+                if(TextUtils.isEmpty(backColorEditText.getText())&&radioButtonText.isChecked())
+                {
+                    showToast("请输入背景颜色值");
+                    return ;
+                }
+                int backColor=0;
+                try {
+                    backColor= Color.parseColor(backColorEditText.getText().toString());//Integer.parseInt(backColorEditText.getText().toString(),16);
+                }catch (Exception e)
+                {
+                    showToast("颜色值输入不正确");
+                    e.printStackTrace();
+                    return;
                 }
                 File output=getOutputFile();
                 if(output==null)
@@ -157,7 +195,13 @@ public class MainActivity extends Activity {
                 }
 
                 progressDialog.show();
-                convertThread=new ConvertThread(handler,imgPath,output,textEdit.getText().toString(),seekBar.getProgress());
+                if(radioButtonBlock.isChecked()) {
+                    convertThread = new ConvertThread(handler, imgPath, output, seekBar.getProgress());
+                }
+                else if(radioButtonText.isChecked())
+                {
+                    convertThread = new ConvertThread(handler, imgPath, output,backColor,textEdit.getText().toString(), seekBar.getProgress());
+                }
                 convertThread.start();
             }
             else if(view.getId()==R.id.main_iv)
@@ -187,13 +231,25 @@ public class MainActivity extends Activity {
         private File out;
         private String text;
         private int fontSize;
-        public ConvertThread(Handler handler,File in,File out,String text,int fontSize)
+        private  int style=0;
+        private  int backColor;
+        public ConvertThread(Handler handler,File in,File out,int backColor,String text,int fontSize)
         {
             this.handler=handler;
             this.in=in;
             this.out=out;
             this.text=text;
             this.fontSize=fontSize;
+            this.style=0;
+            this.backColor=backColor;
+        }
+        public ConvertThread(Handler handler,File in,File out,int fontSize)
+        {
+            this.handler=handler;
+            this.in=in;
+            this.out=out;
+            this.fontSize=fontSize;
+            this.style=1;
         }
         @Override
         public void run() {
@@ -211,7 +267,13 @@ public class MainActivity extends Activity {
         private  byte[] convert(File input,File output,String text,int fontSize)
         {
             Bitmap bitmap= BitmapFactory.decodeFile(input.getAbsolutePath());
-            Bitmap target=Utils.getTextBitmap(bitmap,text,fontSize);
+            Bitmap target=null;
+            if(style==0) {
+                 target = Utils.getTextBitmap(bitmap,backColor, text, fontSize);
+            }else
+            {
+                target = Utils.getBlockBitmap(bitmap, fontSize);
+            }
             FileOutputStream fileOutputStream=null;
             ByteArrayOutputStream byteArrayOutputStream=null;
             try {

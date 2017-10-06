@@ -1,6 +1,7 @@
 package com.luoye.fpic.util;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -16,7 +17,7 @@ public class Utils {
      * @param fontSize 文字大小
      * @return
      */
-    public static Bitmap getTextBitmap(Bitmap bitmap, String text, int fontSize)
+    public static Bitmap getTextBitmap(Bitmap bitmap,int backColor, String text, int fontSize)
     {
         if(bitmap==null)
             throw  new IllegalArgumentException("Bitmap cannot be null.");
@@ -26,7 +27,7 @@ public class Utils {
                 ,(bitmap.getHeight()%fontSize==0)?bitmap.getHeight():((bitmap.getHeight()/fontSize)*fontSize)
                 , Bitmap.Config.ARGB_8888);
         Canvas canvas=new Canvas(back);
-        canvas.drawColor(0xfff);
+        canvas.drawColor(backColor);
         int idx=0;
         for(int y=0;y<picHeight;y+=fontSize)
         {
@@ -51,7 +52,45 @@ public class Utils {
 
         return back;
     }
+    /**
+     * 转成像素图片
+     * @param bitmap 原图片
+     * @param blockSize 块大小
+     * @return
+     */
+    public static Bitmap getBlockBitmap(Bitmap bitmap, int blockSize)
+    {
+        if(bitmap==null)
+            throw  new IllegalArgumentException("Bitmap cannot be null.");
+        int picWidth=bitmap.getWidth();
+        int picHeight=bitmap.getHeight();
+        Bitmap back= Bitmap.createBitmap((bitmap.getWidth()%blockSize==0)?bitmap.getWidth():((bitmap.getWidth()/blockSize)*blockSize)
+                ,(bitmap.getHeight()%blockSize==0)?bitmap.getHeight():((bitmap.getHeight()/blockSize)*blockSize)
+                , Bitmap.Config.ARGB_8888);
+        Canvas canvas=new Canvas(back);
+        canvas.drawColor(0xfff);
+        for(int y=0;y<picHeight;y+=blockSize)
+        {
+            for(int x=0;x<picWidth;x+=blockSize)
+            {
+                int[] colors=getPixels(bitmap,x,y,blockSize,blockSize );
 
+                Paint paint=new Paint();
+                paint.setAntiAlias(true);
+                paint.setColor(getAverage(colors));
+                paint.setStyle(Paint.Style.FILL);
+                int left=x;
+                int top=y;
+                int right=x+blockSize;
+                int bottom=y+blockSize;
+
+                canvas.drawRect(left,top,right,bottom,paint);
+
+            }
+        }
+
+        return back;
+    }
     /**
      * 获取某一块的所有像素的颜色
      * @param bitmap

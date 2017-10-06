@@ -12,14 +12,42 @@
         android:text="选择图片..."
         android:id="@+id/select_file_button"
         android:layout_height="wrap_content"/>
+    <RadioGroup
+        android:id="@+id/main_radio_group"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <RadioButton
+            android:checked="true"
+            android:id="@+id/text_radio_button"
+            android:text="文字图"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <RadioButton
+            android:checked="false"
+            android:id="@+id/block_radio_button"
+            android:text="像素图"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </RadioGroup>
     <EditText
-        android:hint="输入文本"
+        android:hint="用于填充图片的文本"
         android:id="@+id/text_edit"
         android:singleLine="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
     <TextView
-        android:text="字体大小:"
+        android:text="生成图背景颜色（如白色：#ffffffff）"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <EditText
+        android:id="@+id/back_color_edit"
+        android:singleLine="true"
+        android:layout_width="match_parent"
+        android:text="#ffffffff"
+        android:layout_height="wrap_content" />
+    <TextView
+        android:text="字体(像素块）大小:"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
     <LinearLayout
