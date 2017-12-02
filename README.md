@@ -1,6 +1,6 @@
 # 文字代替像素形成图片
 
-![/screenshot/main.png]
+![截图](/screenshot/main.png)
 
 核心代码在Utils.java,用文字代替像素形成图片的算法原理如下： 
 * 1.根据原图片的大小和字体的大小创建一张空白图片 
