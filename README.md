@@ -1,6 +1,6 @@
 # 用文字来绘图
 
-<img src="/screenshot/main.png" style="width:50%;height:50%;"></img>
+<img src="/screenshot/main.png" style="width:20%;height:20%;"></img>
 
 核心代码在Utils.java,用文字代替像素块形成图片的算法原理如下： 
 * 1.根据原图片的大小和字体的大小创建一张空白图片 
